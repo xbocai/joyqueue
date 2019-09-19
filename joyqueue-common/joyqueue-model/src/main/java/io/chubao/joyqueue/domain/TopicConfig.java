@@ -16,6 +16,7 @@
 package io.chubao.joyqueue.domain;
 
 import com.google.common.collect.Maps;
+import org.apache.commons.collections.MapUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -59,8 +60,30 @@ public class TopicConfig extends Topic implements Serializable {
         return config;
     }
 
+    public static TopicConfig toTopicConfig(Topic topic, List<PartitionGroup> partitionGroups) {
+        if (topic == null) {
+            return null;
+        }
+        TopicConfig config = toTopicConfig(topic);
+        Map<Integer, PartitionGroup> partitionGroupMap = Maps.newHashMap();
+        for (PartitionGroup partitionGroup : partitionGroups) {
+            partitionGroupMap.put(partitionGroup.getGroup(), partitionGroup);
+        }
+        config.setPartitionGroups(partitionGroupMap);
+        return config;
+    }
+
     public Map<Integer,PartitionGroup> getPartitionGroups() {
         return partitionGroups;
+    }
+
+    public boolean isReplica(int brokerId) {
+        for (Map.Entry<Integer, PartitionGroup> entry : partitionGroups.entrySet()) {
+            if (entry.getValue().getReplicas().contains(brokerId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<PartitionGroup> fetchPartitionGroupByBrokerId(int brokerId) {
@@ -90,6 +113,9 @@ public class TopicConfig extends Topic implements Serializable {
 
     private Map<Short, PartitionGroup> buildPartitionGroupMap(Map<Integer,PartitionGroup> partitionGroups) {
         Map<Short, PartitionGroup> result = Maps.newHashMap();
+        if (MapUtils.isEmpty(partitionGroups)) {
+            return result;
+        }
         for (PartitionGroup partitionGroup : partitionGroups.values()) {
             for (Short partition : partitionGroup.getPartitions()) {
                 result.put(partition, partitionGroup);
