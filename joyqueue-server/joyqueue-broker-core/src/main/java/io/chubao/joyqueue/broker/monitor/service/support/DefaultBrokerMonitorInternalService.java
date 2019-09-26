@@ -17,10 +17,15 @@ package io.chubao.joyqueue.broker.monitor.service.support;
 
 import io.chubao.joyqueue.broker.cluster.ClusterManager;
 import io.chubao.joyqueue.broker.consumer.Consume;
-import io.chubao.joyqueue.broker.election.ElectionService;
 import io.chubao.joyqueue.broker.monitor.converter.BrokerMonitorConverter;
 import io.chubao.joyqueue.broker.monitor.exception.MonitorException;
 import io.chubao.joyqueue.broker.monitor.service.BrokerMonitorInternalService;
+import io.chubao.joyqueue.broker.monitor.stat.BrokerStat;
+import io.chubao.joyqueue.broker.monitor.stat.BrokerStatExt;
+import io.chubao.joyqueue.broker.monitor.stat.ConsumerPendingStat;
+import io.chubao.joyqueue.broker.monitor.stat.PartitionGroupPendingStat;
+import io.chubao.joyqueue.broker.monitor.stat.TopicPendingStat;
+import io.chubao.joyqueue.broker.monitor.stat.TopicStat;
 import io.chubao.joyqueue.monitor.BrokerMonitorInfo;
 import io.chubao.joyqueue.monitor.BrokerStartupInfo;
 import io.chubao.joyqueue.monitor.ElectionMonitorInfo;
@@ -28,12 +33,6 @@ import io.chubao.joyqueue.monitor.NameServerMonitorInfo;
 import io.chubao.joyqueue.monitor.StoreMonitorInfo;
 import io.chubao.joyqueue.network.session.Consumer;
 import io.chubao.joyqueue.nsr.NameService;
-import io.chubao.joyqueue.broker.monitor.stat.BrokerStat;
-import io.chubao.joyqueue.broker.monitor.stat.BrokerStatExt;
-import io.chubao.joyqueue.broker.monitor.stat.ConsumerPendingStat;
-import io.chubao.joyqueue.broker.monitor.stat.PartitionGroupPendingStat;
-import io.chubao.joyqueue.broker.monitor.stat.TopicPendingStat;
-import io.chubao.joyqueue.broker.monitor.stat.TopicStat;
 import io.chubao.joyqueue.store.StoreManagementService;
 import io.chubao.joyqueue.store.StoreService;
 import io.chubao.joyqueue.toolkit.format.Format;
@@ -59,20 +58,18 @@ public class DefaultBrokerMonitorInternalService implements BrokerMonitorInterna
     private StoreManagementService storeManagementService;
     private NameService nameService;
     private StoreService storeService;
-    private ElectionService electionService;
     private ClusterManager clusterManager;
     private BrokerStartupInfo brokerStartupInfo;
 
     public DefaultBrokerMonitorInternalService(BrokerStat brokerStat, Consume consume,
                                                StoreManagementService storeManagementService,
                                                NameService nameService, StoreService storeService,
-                                               ElectionService electionManager, ClusterManager clusterManager, BrokerStartupInfo brokerStartupInfo) {
+                                               ClusterManager clusterManager, BrokerStartupInfo brokerStartupInfo) {
         this.brokerStat = brokerStat;
         this.consume = consume;
         this.storeManagementService=storeManagementService;
         this.nameService = nameService;
         this.storeService = storeService;
-        this.electionService = electionManager;
         this.clusterManager = clusterManager;
         this.brokerStartupInfo = brokerStartupInfo;
     }
@@ -94,7 +91,8 @@ public class DefaultBrokerMonitorInternalService implements BrokerMonitorInterna
         nameServerMonitorInfo.setStarted(nameService.isStarted());
 
         ElectionMonitorInfo electionMonitorInfo = new ElectionMonitorInfo();
-        boolean electionStarted = electionService instanceof Online ? ((Online) electionService).isStarted() : true;
+        // TODO: 这个监控已经没意义了，是否要去掉？
+        boolean electionStarted = true;
         electionMonitorInfo.setStarted(electionStarted);
 
         brokerMonitorInfo.getReplication().setStarted(electionStarted);

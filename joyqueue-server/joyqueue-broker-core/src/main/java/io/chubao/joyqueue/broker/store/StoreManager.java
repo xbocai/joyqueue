@@ -20,7 +20,6 @@ import io.chubao.joyqueue.broker.BrokerContext;
 import io.chubao.joyqueue.broker.BrokerContextAware;
 import io.chubao.joyqueue.broker.cluster.ClusterManager;
 import io.chubao.joyqueue.broker.config.BrokerStoreConfig;
-import io.chubao.joyqueue.broker.election.ElectionService;
 import io.chubao.joyqueue.nsr.NameService;
 import io.chubao.joyqueue.store.StoreService;
 import io.chubao.joyqueue.toolkit.config.PropertySupplier;
@@ -41,15 +40,13 @@ public class StoreManager extends Service implements BrokerContextAware, Propert
     private ClusterManager clusterManager;
     private StoreService storeService;
     private StoreCleanManager storeCleanManager;
-    private ElectionService electionService;
 
     private BrokerStoreConfig config;
 
-    public StoreManager(StoreService storeService , NameService nameService, ClusterManager clusterManager, ElectionService electionService) {
+    public StoreManager(StoreService storeService , NameService nameService, ClusterManager clusterManager) {
         this.storeService = storeService;
         this.nameService = nameService;
         this.clusterManager = clusterManager;
-        this.electionService = electionService;
     }
 
     @Override

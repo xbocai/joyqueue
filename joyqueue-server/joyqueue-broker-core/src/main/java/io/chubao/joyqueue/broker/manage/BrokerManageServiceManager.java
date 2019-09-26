@@ -20,14 +20,12 @@ import io.chubao.joyqueue.broker.cluster.ClusterManager;
 import io.chubao.joyqueue.broker.consumer.Consume;
 import io.chubao.joyqueue.broker.consumer.MessageConvertSupport;
 import io.chubao.joyqueue.broker.coordinator.CoordinatorService;
-import io.chubao.joyqueue.broker.election.ElectionService;
 import io.chubao.joyqueue.broker.manage.service.BrokerManageService;
 import io.chubao.joyqueue.broker.manage.service.ConnectionManageService;
 import io.chubao.joyqueue.broker.manage.service.support.DefaultBrokerManageService;
 import io.chubao.joyqueue.broker.manage.service.support.DefaultConnectionManageService;
 import io.chubao.joyqueue.broker.manage.service.support.DefaultConsumerManageService;
 import io.chubao.joyqueue.broker.manage.service.support.DefaultCoordinatorManageService;
-import io.chubao.joyqueue.broker.manage.service.support.DefaultElectionManageService;
 import io.chubao.joyqueue.broker.manage.service.support.DefaultMessageManageService;
 import io.chubao.joyqueue.broker.manage.service.support.DefaultStoreManageService;
 import io.chubao.joyqueue.broker.monitor.BrokerMonitor;
@@ -73,14 +71,13 @@ public class BrokerManageServiceManager extends Service {
     private CoordinatorService coordinatorService;
     private ArchiveManager archiveManager;
     private NameService nameService;
-    private ElectionService electionManager;
     private MessageConvertSupport messageConvertSupport;
 
     public BrokerManageServiceManager(BrokerMonitor brokerMonitor, ClusterManager clusterManager,
                                       StoreManagementService storeManagementService,
                                       StoreService storeService, Consume consume,
                                       MessageRetry messageRetry, CoordinatorService coordinatorService,
-                                      ArchiveManager archiveManager, NameService nameService, ElectionService electionManager,
+                                      ArchiveManager archiveManager, NameService nameService,
                                       MessageConvertSupport messageConvertSupport) {
         this.brokerMonitor = brokerMonitor;
         this.clusterManager = clusterManager;
@@ -91,7 +88,6 @@ public class BrokerManageServiceManager extends Service {
         this.coordinatorService = coordinatorService;
         this.archiveManager = archiveManager;
         this.nameService = nameService;
-        this.electionManager = electionManager;
         this.messageConvertSupport = messageConvertSupport;
     }
 
@@ -105,7 +101,7 @@ public class BrokerManageServiceManager extends Service {
         BrokerStat brokerStat = brokerMonitor.getBrokerStat();
         BrokerStartupInfo brokerStartupInfo = newBrokerStartInfo();
         DefaultBrokerMonitorInternalService brokerMonitorInternalService = new DefaultBrokerMonitorInternalService(brokerStat, consume,
-                storeManagementService, nameService, storeService, electionManager, clusterManager, brokerStartupInfo);
+                storeManagementService, nameService, storeService, clusterManager, brokerStartupInfo);
         DefaultConnectionMonitorService connectionMonitorService = new DefaultConnectionMonitorService(brokerStat);
         DefaultConsumerMonitorService consumerMonitorService = new DefaultConsumerMonitorService(brokerStat, consume, storeManagementService, retryManager, clusterManager);
         DefaultProducerMonitorService producerMonitorService = new DefaultProducerMonitorService(brokerStat, storeManagementService, clusterManager);
@@ -127,8 +123,7 @@ public class BrokerManageServiceManager extends Service {
         DefaultStoreManageService storeManageService = new DefaultStoreManageService(storeManagementService);
         DefaultConsumerManageService consumerManageService = new DefaultConsumerManageService(consume, storeManagementService, storeService, clusterManager,brokerMonitor);
         DefaultCoordinatorManageService coordinatorManageService = new DefaultCoordinatorManageService(coordinatorService);
-        DefaultElectionManageService electionManageService = new DefaultElectionManageService(electionManager);
-        return new DefaultBrokerManageService(connectionManageService, messageManageService, storeManageService, consumerManageService, coordinatorManageService, electionManageService);
+        return new DefaultBrokerManageService(connectionManageService, messageManageService, storeManageService, consumerManageService, coordinatorManageService);
     }
 
     protected BrokerStartupInfo newBrokerStartInfo() {

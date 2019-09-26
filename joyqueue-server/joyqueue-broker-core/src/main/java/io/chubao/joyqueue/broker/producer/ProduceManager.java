@@ -293,9 +293,9 @@ public class ProduceManager extends Service implements Produce, BrokerContextAwa
             PartitionGroup partitionGroup = dispatchEntry.getKey();
             List<WriteRequest> writeRequests = dispatchEntry.getValue();
 
-            PartitionGroupStore partitionStore = store.getStore(topic, partitionGroup.getGroup(), qosLevel);
+            PartitionGroupStore partitionStore = store.getStore(topic, partitionGroup.getGroup());
             // 异步写入磁盘
-            Future<WriteResult> writeResultFuture = partitionStore.asyncWrite(writeRequests.toArray(new WriteRequest[]{}));
+            Future<WriteResult> writeResultFuture = partitionStore.asyncWrite(qosLevel, writeRequests.toArray(new WriteRequest[]{}));
             // 同步等待写入完成
             WriteResult writeResult = syncWait(writeResultFuture, endTime - SystemClock.now());
             // 构造写入结果
@@ -338,7 +338,7 @@ public class ProduceManager extends Service implements Produce, BrokerContextAwa
                 logger.debug("ProduceManager writeMessageAsync topic:[{}], partitionGroup:[{}]]", topic, partitionGroup);
             }
             List<WriteRequest> writeRequests = dispatchEntry.getValue();
-            PartitionGroupStore partitionStore = store.getStore(topic, partitionGroup.getGroup(), qosLevel);
+            PartitionGroupStore partitionStore = store.getStore(topic, partitionGroup.getGroup());
 
             long startTime = SystemClock.now();
             // 异步写入磁盘
@@ -346,6 +346,7 @@ public class ProduceManager extends Service implements Produce, BrokerContextAwa
                 long t0 = System.nanoTime();
 
                 partitionStore.asyncWrite(new MetricEventListener(t0, startTime, metric, eventListener, topic, app, partitionGroup.getGroup(), writeRequests),
+                        qosLevel,
                         writeRequests.toArray(new WriteRequest[]{}));
 
                 long t1 = System.nanoTime();
@@ -356,7 +357,7 @@ public class ProduceManager extends Service implements Produce, BrokerContextAwa
                 partitionStore.asyncWrite(event -> {
                     onPutMessage(topic, app, partitionGroup.getGroup(), startTime, writeRequests);
                     eventListener.onEvent(event);
-                }, writeRequests.toArray(new WriteRequest[]{}));
+                }, qosLevel, writeRequests.toArray(new WriteRequest[]{}));
             }
 
             if (qosLevel.equals(QosLevel.ONE_WAY)) {

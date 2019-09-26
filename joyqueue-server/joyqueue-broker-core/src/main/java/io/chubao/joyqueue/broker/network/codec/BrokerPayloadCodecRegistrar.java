@@ -15,22 +15,6 @@
  */
 package io.chubao.joyqueue.broker.network.codec;
 
-import io.chubao.joyqueue.broker.election.network.codec.AppendEntriesRequestDecoder;
-import io.chubao.joyqueue.broker.election.network.codec.AppendEntriesRequestEncoder;
-import io.chubao.joyqueue.broker.election.network.codec.AppendEntriesResponseDecoder;
-import io.chubao.joyqueue.broker.election.network.codec.AppendEntriesResponseEncoder;
-import io.chubao.joyqueue.broker.election.network.codec.ReplicateConsumePosRequestDecoder;
-import io.chubao.joyqueue.broker.election.network.codec.ReplicateConsumePosRequestEncoder;
-import io.chubao.joyqueue.broker.election.network.codec.ReplicateConsumePosResponseDecoder;
-import io.chubao.joyqueue.broker.election.network.codec.ReplicateConsumePosResponseEncoder;
-import io.chubao.joyqueue.broker.election.network.codec.TimeoutNowRequestDecoder;
-import io.chubao.joyqueue.broker.election.network.codec.TimeoutNowRequestEncoder;
-import io.chubao.joyqueue.broker.election.network.codec.TimeoutNowResponseDecoder;
-import io.chubao.joyqueue.broker.election.network.codec.TimeoutNowResponseEncoder;
-import io.chubao.joyqueue.broker.election.network.codec.VoteRequestDecoder;
-import io.chubao.joyqueue.broker.election.network.codec.VoteRequestEncoder;
-import io.chubao.joyqueue.broker.election.network.codec.VoteResponseDecoder;
-import io.chubao.joyqueue.broker.election.network.codec.VoteResponseEncoder;
 import io.chubao.joyqueue.broker.index.network.codec.IndexQueryRequestDecoder;
 import io.chubao.joyqueue.broker.index.network.codec.IndexQueryRequestEncoder;
 import io.chubao.joyqueue.broker.index.network.codec.IndexQueryResponseDecoder;
@@ -73,20 +57,6 @@ public class BrokerPayloadCodecRegistrar {
         payloadCodecFactory.register(new PutRetryCodec());
         payloadCodecFactory.register(new UpdateRetryCodec());
 
-        // raft election command codec
-        payloadCodecFactory.register(new VoteRequestDecoder());
-        payloadCodecFactory.register(new VoteRequestEncoder());
-        payloadCodecFactory.register(new VoteResponseDecoder());
-        payloadCodecFactory.register(new VoteResponseEncoder());
-        payloadCodecFactory.register(new TimeoutNowRequestDecoder());
-        payloadCodecFactory.register(new TimeoutNowRequestEncoder());
-        payloadCodecFactory.register(new TimeoutNowResponseDecoder());
-        payloadCodecFactory.register(new TimeoutNowResponseEncoder());
-        payloadCodecFactory.register(new AppendEntriesRequestDecoder());
-        payloadCodecFactory.register(new AppendEntriesRequestEncoder());
-        payloadCodecFactory.register(new AppendEntriesResponseDecoder());
-        payloadCodecFactory.register(new AppendEntriesResponseEncoder());
-
         // index manage command codec
         payloadCodecFactory.register(new IndexQueryRequestDecoder());
         payloadCodecFactory.register(new IndexQueryRequestEncoder());
@@ -97,11 +67,6 @@ public class BrokerPayloadCodecRegistrar {
         payloadCodecFactory.register(new IndexStoreResponseDecoder());
         payloadCodecFactory.register(new IndexStoreResponseEncoder());
 
-        // replication related command
-        payloadCodecFactory.register(new ReplicateConsumePosRequestDecoder());
-        payloadCodecFactory.register(new ReplicateConsumePosRequestEncoder());
-        payloadCodecFactory.register(new ReplicateConsumePosResponseDecoder());
-        payloadCodecFactory.register(new ReplicateConsumePosResponseEncoder());
         //nsr
         payloadCodecFactory.register(new OperatePartitionGroupCodec());
 

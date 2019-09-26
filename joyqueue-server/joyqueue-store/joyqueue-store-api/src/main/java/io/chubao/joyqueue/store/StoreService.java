@@ -15,12 +15,11 @@
  */
 package io.chubao.joyqueue.store;
 
-import io.chubao.joyqueue.domain.QosLevel;
 import io.chubao.joyqueue.monitor.BufferPoolMonitorInfo;
-import io.chubao.joyqueue.store.replication.ReplicableStore;
 import io.chubao.joyqueue.store.transaction.TransactionStore;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -77,22 +76,13 @@ public interface StoreService {
      * @param topic Topic
      * @param partitionGroup Partition group
      * @param partitions Partition
+     * @param brokers 所有副本（包含本节点）的BrokerId
+     * @param thisBrokerId 本节点的BrokerId
      */
-    void createPartitionGroup(String topic, int partitionGroup, short[] partitions);
+    void createPartitionGroup(String topic, int partitionGroup, short[] partitions, List<Integer> brokers, int thisBrokerId);
 
     /**
      * 获取{@link PartitionGroupStore} 实例
-     * @param topic Topic
-     * @param partitionGroup Partition group
-     * @param writeQosLevel 写入Qos级别
-     * @return {@link PartitionGroupStore} 实例，不存在时返回null。
-     */
-    PartitionGroupStore getStore(String topic, int partitionGroup, QosLevel writeQosLevel);
-
-    /**
-     * 获取{@link PartitionGroupStore} 实例，使用默认的Qos级别
-     * @see QosLevel#REPLICATION。
-     * @see #getStore(java.lang.String, int, io.chubao.joyqueue.domain.QosLevel)
      * @param topic Topic
      * @param partitionGroup Partition group
      * @return {@link PartitionGroupStore} 实例，不存在时返回null。
@@ -107,25 +97,20 @@ public interface StoreService {
     List<PartitionGroupStore> getStore(String topic);
 
     /**
-     * 变更Partition group中的Partition
+     * 如果当前节点是Leader，变更Partition group中的Partition
      * @throws NoSuchPartitionGroupException PartitionGroup不存在时抛出此异常
      * @throws IOException 创建/删除Partition时读写文件异常时抛出
      * @param topic Topic
      * @param partitionGroup Partition group
      * @param partitions 变更后的Partition数组
      */
-    void rePartition(String topic, int partitionGroup, Short[] partitions) throws IOException;
+    void maybeRePartition(String topic, int partitionGroup, Collection<Short> partitions) throws IOException;
 
     /**
-     * 获取{@link ReplicableStore} 实例
-     * @see QosLevel#REPLICATION。
-     * @see #getStore(java.lang.String, int, io.chubao.joyqueue.domain.QosLevel)
-     * @param topic Topic
-     * @param partitionGroup Partition group
-     * @return {@link ReplicableStore} 实例，不存在时返回null。
+     * 如果当前节点是Leader，执行配置变更
+     * @param newBrokerIds 变更后的新配置
      */
-
-    ReplicableStore getReplicableStore(String topic, int partitionGroup);
+    void maybeUpdateConfig(String topic, int partitionGroup, Collection<Integer> newBrokerIds);
 
     /**
      * 获取管理接口 {@link StoreManagementService} 实例

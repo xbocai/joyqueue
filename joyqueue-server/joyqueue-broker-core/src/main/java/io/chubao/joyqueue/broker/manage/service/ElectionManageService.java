@@ -38,11 +38,5 @@ public interface ElectionManageService {
      */
     String describeTopic(String topic, int partitionGroup);
 
-    /**
-     * 更新主题下分区组的选举轮次
-     * @param topic 主题
-     * @param partitionGroup 分区组
-     * @param term 轮次
-     */
-    void updateTerm(String topic, int partitionGroup, int term);
+
 }

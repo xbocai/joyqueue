@@ -26,7 +26,6 @@ import io.chubao.joyqueue.broker.consumer.Consume;
 import io.chubao.joyqueue.broker.consumer.MessageConvertSupport;
 import io.chubao.joyqueue.broker.coordinator.CoordinatorService;
 import io.chubao.joyqueue.broker.coordinator.config.CoordinatorConfig;
-import io.chubao.joyqueue.broker.election.ElectionService;
 import io.chubao.joyqueue.broker.helper.AwareHelper;
 import io.chubao.joyqueue.broker.manage.BrokerManageService;
 import io.chubao.joyqueue.broker.manage.config.BrokerManageConfig;
@@ -87,7 +86,6 @@ public class BrokerService extends Service {
     private Consume consume;
     private StoreService storeService;
     private StoreInitializer storeInitializer;
-    private ElectionService electionService;
     private MessageRetry retryManager;
     private BrokerContext brokerContext;
     private ConfigurationManager configurationManager;
@@ -183,12 +181,8 @@ public class BrokerService extends Service {
         this.consume = getConsume(brokerContext);
         this.brokerContext.consume(consume);
 
-        // build election
-        this.electionService = getElectionService(brokerContext);
-        this.brokerContext.electionService(electionService);
-
         this.storeInitializer = new StoreInitializer(new BrokerStoreConfig(configuration), nameService,
-                clusterManager, storeService, electionService);
+                clusterManager, storeService);
 
         // manage service
         this.brokerManageService = new BrokerManageService(new BrokerManageConfig(configuration,brokerConfig),
@@ -201,12 +195,11 @@ public class BrokerService extends Service {
                 coordinatorService,
                 archiveManager,
                 nameService,
-                electionService,
                 messageConvertSupport);
         this.brokerContext.brokerManageService(brokerManageService);
 
         //build store manager
-        this.storeManager = new StoreManager(storeService, nameService, clusterManager, electionService);
+        this.storeManager = new StoreManager(storeService, nameService, clusterManager);
         enrichIfNecessary(storeManager, brokerContext);
         //build protocol manager
         this.protocolManager = new ProtocolManager(brokerContext);
@@ -301,13 +294,6 @@ public class BrokerService extends Service {
         return consume;
     }
 
-    private ElectionService getElectionService(BrokerContext brokerContext) {
-        ElectionService electionService = Plugins.ELECTION.get();
-        Preconditions.checkArgument(electionService != null, "election service can not be null");
-        enrichIfNecessary(electionService, brokerContext);
-        return electionService;
-    }
-
     private Consumer.ConsumerPolicy buildGlobalConsumePolicy(PropertySupplier propertySupplier) {
         //TODO
         return new Consumer.ConsumerPolicy.Builder().create();
@@ -331,7 +317,6 @@ public class BrokerService extends Service {
         startIfNecessary(consume);
         //must start after store manager
         startIfNecessary(storeManager);
-        startIfNecessary(electionService);
         startIfNecessary(protocolManager);
         startIfNecessary(brokerServer);
         startIfNecessary(coordinatorService);
@@ -367,7 +352,6 @@ public class BrokerService extends Service {
 
         destroy(brokerServer);
         destroy(protocolManager);
-        destroy(electionService);
         destroy(produce);
         destroy(consume);
         destroy(coordinatorService);

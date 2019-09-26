@@ -103,7 +103,7 @@
         </dependency>
         <dependency>
             <groupId>io.chubao</groupId>
-            <artifactId>joyqueue-store-core</artifactId>
+            <artifactId>joyqueue-store-journalkeeper</artifactId>
         </dependency>
         <dependency>
             <groupId>io.chubao</groupId>

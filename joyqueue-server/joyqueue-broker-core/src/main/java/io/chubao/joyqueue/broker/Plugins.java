@@ -15,9 +15,11 @@
  */
 package io.chubao.joyqueue.broker;
 
+import com.jd.laf.extension.ExtensionPoint;
+import com.jd.laf.extension.ExtensionPointLazy;
+import com.jd.laf.extension.SpiLoader;
 import io.chubao.joyqueue.broker.consumer.Consume;
 import io.chubao.joyqueue.broker.consumer.MessageConverter;
-import io.chubao.joyqueue.broker.election.ElectionService;
 import io.chubao.joyqueue.broker.limit.LimitRejectedStrategy;
 import io.chubao.joyqueue.broker.producer.Produce;
 import io.chubao.joyqueue.nsr.NameService;
@@ -26,9 +28,6 @@ import io.chubao.joyqueue.server.archive.store.api.ArchiveStore;
 import io.chubao.joyqueue.server.retry.api.MessageRetry;
 import io.chubao.joyqueue.store.StoreService;
 import io.chubao.joyqueue.toolkit.config.PropertySupplier;
-import com.jd.laf.extension.ExtensionPoint;
-import com.jd.laf.extension.ExtensionPointLazy;
-import com.jd.laf.extension.SpiLoader;
 
 public interface Plugins {
     /**
@@ -48,11 +47,6 @@ public interface Plugins {
      * 存储扩展点
      */
     ExtensionPoint<StoreService, String> STORE = new ExtensionPointLazy<>(StoreService.class, SpiLoader.INSTANCE, null, null);
-
-    /**
-     * 选举扩展点
-     */
-    ExtensionPoint<ElectionService, String> ELECTION = new ExtensionPointLazy<>(ElectionService.class, SpiLoader.INSTANCE, null, null);
 
     /**
      * 认证扩展点

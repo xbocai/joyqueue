@@ -173,9 +173,9 @@ public class TransactionManager extends Service {
 
             try {
                 for (Map.Entry<Integer, List<WriteRequest>> entry : writeRequestMap.entrySet()) {
-                    PartitionGroupStore partitionStoreService = store.getStore(commit.getTopic(), entry.getKey(), QosLevel.REPLICATION);
+                    PartitionGroupStore partitionStoreService = store.getStore(commit.getTopic(), entry.getKey());
                     long startTime = SystemClock.now();
-                    Future<WriteResult> future = partitionStoreService.asyncWrite(entry.getValue().toArray(new WriteRequest[0]));
+                    Future<WriteResult> future = partitionStoreService.asyncWrite( QosLevel.REPLICATION, entry.getValue().toArray(new WriteRequest[0]));
                     waitFuture(producer, future);
                     long endTime = SystemClock.now();
 

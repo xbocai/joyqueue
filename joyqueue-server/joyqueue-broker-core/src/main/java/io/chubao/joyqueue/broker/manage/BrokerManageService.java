@@ -20,7 +20,6 @@ import io.chubao.joyqueue.broker.cluster.ClusterManager;
 import io.chubao.joyqueue.broker.consumer.Consume;
 import io.chubao.joyqueue.broker.consumer.MessageConvertSupport;
 import io.chubao.joyqueue.broker.coordinator.CoordinatorService;
-import io.chubao.joyqueue.broker.election.ElectionService;
 import io.chubao.joyqueue.broker.manage.config.BrokerManageConfig;
 import io.chubao.joyqueue.broker.manage.exporter.BrokerManageExporter;
 import io.chubao.joyqueue.broker.monitor.BrokerMonitorService;
@@ -51,7 +50,7 @@ public class BrokerManageService extends Service {
                                ClusterManager clusterManager, StoreManagementService storeManagementService,
                                StoreService storeService, Consume consume,
                                MessageRetry retryManager, CoordinatorService coordinatorService,
-                               ArchiveManager archiveManager, NameService nameService, ElectionService electionManager,
+                               ArchiveManager archiveManager, NameService nameService,
                                MessageConvertSupport messageConvertSupport) {
         this.config = config;
         this.storeService = storeService;
@@ -61,7 +60,7 @@ public class BrokerManageService extends Service {
                 clusterManager, storeManagementService,
                 storeService, consume,
                 retryManager, coordinatorService,
-                archiveManager, nameService, electionManager, messageConvertSupport);
+                archiveManager, nameService, messageConvertSupport);
         this.brokerManageExporter = new BrokerManageExporter(config, brokerManageServiceManager);
     }
 

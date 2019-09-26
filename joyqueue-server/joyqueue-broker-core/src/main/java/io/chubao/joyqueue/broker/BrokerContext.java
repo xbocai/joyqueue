@@ -22,7 +22,6 @@ import io.chubao.joyqueue.broker.consumer.Consume;
 import io.chubao.joyqueue.broker.consumer.MessageConvertSupport;
 import io.chubao.joyqueue.broker.consumer.position.PositionManager;
 import io.chubao.joyqueue.broker.coordinator.CoordinatorService;
-import io.chubao.joyqueue.broker.election.ElectionService;
 import io.chubao.joyqueue.broker.manage.BrokerManageService;
 import io.chubao.joyqueue.broker.monitor.BrokerMonitor;
 import io.chubao.joyqueue.broker.monitor.BrokerMonitorService;
@@ -52,7 +51,6 @@ public class BrokerContext {
     private PositionManager positionManager;
     private Authentication authentication;
     private StoreService storeService;
-    private ElectionService electionService;
     private MessageRetry retryManager;
     private BrokerMonitorService brokerMonitorService;
     private BrokerManageService brokerManageService;
@@ -71,7 +69,7 @@ public class BrokerContext {
     @Deprecated
     public BrokerContext(BrokerConfig brokerConfig, SessionManager sessionManager, ClusterManager clusterManager,
                          Produce produce, Consume consume, Authentication authentication, StoreService storeService,
-                         ElectionService electionService, MessageRetry retryManager, BrokerMonitorService brokerMonitorService,
+                         MessageRetry retryManager, BrokerMonitorService brokerMonitorService,
                          BrokerManageService brokerManageService, NameService nameService, CoordinatorService coordinatorService) {
 
         this.brokerConfig = brokerConfig;
@@ -81,7 +79,6 @@ public class BrokerContext {
         this.consume = consume;
         this.authentication = authentication;
         this.storeService = storeService;
-        this.electionService = electionService;
         this.retryManager = retryManager;
         this.brokerMonitorService = brokerMonitorService;
         this.brokerManageService = brokerManageService;
@@ -127,10 +124,6 @@ public class BrokerContext {
 
     public StoreService getStoreService() {
         return storeService;
-    }
-
-    public ElectionService getElectionService() {
-        return electionService;
     }
 
     public MessageRetry getRetryManager() {
@@ -219,12 +212,6 @@ public class BrokerContext {
         this.storeService = storeService;
         return this;
     }
-
-    public BrokerContext electionService(ElectionService electionService) {
-        this.electionService = electionService;
-        return this;
-    }
-
 
     public BrokerContext retryManager(MessageRetry messageRetry) {
         this.retryManager = messageRetry;

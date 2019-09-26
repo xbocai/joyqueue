@@ -15,6 +15,7 @@
  */
 package io.chubao.joyqueue.store;
 
+import io.chubao.joyqueue.domain.QosLevel;
 import io.chubao.joyqueue.toolkit.concurrent.EventListener;
 
 import java.io.IOException;
@@ -80,7 +81,7 @@ public interface PartitionGroupStore {
      * @see WriteResult
      * @see WriteRequest
      */
-    Future<WriteResult> asyncWrite(WriteRequest... writeRequests);
+    Future<WriteResult> asyncWrite(QosLevel qosLevel, WriteRequest... writeRequests);
 
     /**
      * 异步写入消息，线程安全，保证ACI，D的保证取决于WriteQosLevel
@@ -90,7 +91,7 @@ public interface PartitionGroupStore {
      * @see WriteResult
      * @see WriteRequest
      */
-    void asyncWrite(EventListener<WriteResult> eventListener, WriteRequest... writeRequests);
+    void asyncWrite(EventListener<WriteResult> eventListener, QosLevel qosLevel, WriteRequest... writeRequests);
 
 
 
