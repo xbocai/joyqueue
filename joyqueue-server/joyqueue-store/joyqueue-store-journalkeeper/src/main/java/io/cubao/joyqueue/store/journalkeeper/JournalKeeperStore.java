@@ -1,5 +1,8 @@
 package io.cubao.joyqueue.store.journalkeeper;
 
+import io.chubao.joyqueue.broker.BrokerContext;
+import io.chubao.joyqueue.broker.BrokerContextAware;
+import io.chubao.joyqueue.domain.Broker;
 import io.chubao.joyqueue.monitor.BufferPoolMonitorInfo;
 import io.chubao.joyqueue.store.PartitionGroupStore;
 import io.chubao.joyqueue.store.StoreManagementService;
@@ -28,13 +31,14 @@ import java.util.stream.Collectors;
  * @author LiYue
  * Date: 2019-09-19
  */
-public class JournalKeeperStore implements StoreService, PropertySupplierAware {
+public class JournalKeeperStore implements StoreService, PropertySupplierAware, BrokerContextAware {
     private static final Logger logger = LoggerFactory.getLogger(JournalKeeperStore.class);
     private static final String TOPICS_PATH = "topics";
     public static final String STORE_PATH = "store";
     private Map<TopicPartitionGroup, JournalKeeperPartitionGroupStore> storeMap = new ConcurrentHashMap<>();
     private File base;
     private PropertySupplier propertySupplier;
+    private BrokerContext brokerContext;
 
 
     @Override
@@ -193,8 +197,13 @@ public class JournalKeeperStore implements StoreService, PropertySupplierAware {
                 .collect(Collectors.toList());
     }
 
+//    private URI toURI(int brokerId, String topic, int group) {
+//        return URI.create("joyqueue://" + topic + "/" + group + "/" + brokerId);
+//    }
     private URI toURI(int brokerId, String topic, int group) {
-        return URI.create("joyqueue://" + topic + "/" + group + "/" + brokerId);
+        Broker broker = brokerContext.getClusterManager().getBrokerById(brokerId);
+
+        return URI.create("jk://" + broker.getIp() + ":" + broker.getPort());
     }
     private void checkOrCreateBase() throws IOException{
         if (!base.exists()) {
@@ -218,6 +227,11 @@ public class JournalKeeperStore implements StoreService, PropertySupplierAware {
         }catch (Exception e) {
             logger.warn("Exception: ", e);
         }
+    }
+
+    @Override
+    public void setBrokerContext(BrokerContext brokerContext) {
+        this.brokerContext = brokerContext;
     }
 
     private static class TopicPartitionGroup {

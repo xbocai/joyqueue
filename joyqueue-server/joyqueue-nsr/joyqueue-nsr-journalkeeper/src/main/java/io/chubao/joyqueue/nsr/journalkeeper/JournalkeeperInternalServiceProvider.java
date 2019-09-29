@@ -15,9 +15,11 @@ import io.journalkeeper.sql.client.SQLClient;
 import io.journalkeeper.sql.client.SQLClientAccessPoint;
 import io.journalkeeper.sql.client.SQLOperator;
 import io.journalkeeper.sql.client.support.DefaultSQLOperator;
+import io.journalkeeper.sql.druid.config.DruidConfigs;
 import io.journalkeeper.sql.server.SQLServer;
 import io.journalkeeper.sql.server.SQLServerAccessPoint;
 import io.journalkeeper.sql.state.config.SQLConfigs;
+import io.journalkeeper.sql.state.jdbc.config.JDBCConfigs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +44,6 @@ public class JournalkeeperInternalServiceProvider extends Service implements Int
     private SQLClient sqlClient;
     private SQLOperator sqlOperator;
     private JournalkeeperInternalServiceManager journalkeeperInternalServiceManager;
-
     @Override
     public void setSupplier(PropertySupplier propertySupplier) {
         this.propertySupplier = propertySupplier;
@@ -62,6 +63,8 @@ public class JournalkeeperInternalServiceProvider extends Service implements Int
             Server.Roll role = Server.Roll.valueOf(config.getRole());
             SQLServerAccessPoint serverAccessPoint = new SQLServerAccessPoint(journalkeeperProperties);
             this.sqlServer = serverAccessPoint.createServer(nodes.get(0), nodes, role);
+            this.sqlServer.init();
+            this.sqlServer.recover();
             this.sqlClient = this.sqlServer.getClient();
         } else {
             SQLClientAccessPoint clientAccessPoint = new SQLClientAccessPoint(journalkeeperProperties);
@@ -74,11 +77,7 @@ public class JournalkeeperInternalServiceProvider extends Service implements Int
 
     protected Properties convertProperties(JournalkeeperConfig config, List<Property> properties) {
         Properties result = new Properties();
-        for (Property property : properties) {
-            if (property.getKey().startsWith(JournalkeeperConfigKey.PREFIX.getName())) {
-                result.setProperty(property.getKey().substring(JournalkeeperConfigKey.PREFIX.getName().length() + 1), property.getString());
-            }
-        }
+
 
         result.setProperty(AbstractServer.Config.SNAPSHOT_STEP_KEY, String.valueOf(config.getSnapshotStep()));
         result.setProperty(AbstractServer.Config.RPC_TIMEOUT_MS_KEY, String.valueOf(config.getRpcTimeout()));
@@ -88,6 +87,15 @@ public class JournalkeeperInternalServiceProvider extends Service implements Int
         result.setProperty(AbstractServer.Config.ENABLE_METRIC_KEY, String.valueOf(config.getMetricEnable()));
         result.setProperty(AbstractServer.Config.PRINT_METRIC_INTERVAL_SEC_KEY, String.valueOf(config.getMetricPrintInterval()));
         result.setProperty(SQLConfigs.INIT_FILE, config.getInitFile());
+        result.setProperty(JDBCConfigs.DATASOURCE_TYPE, "druid");
+        result.setProperty(DruidConfigs.URL, "jdbc:h2:file:{datasource.path}/joyqueue;DB_CLOSE_DELAY=TRUE;AUTO_SERVER=TRUE");
+        result.setProperty(DruidConfigs.DRIVER_CLASS, "org.h2.Driver");
+
+        for (Property property : properties) {
+            if (property.getKey().startsWith(JournalkeeperConfigKey.PREFIX.getName())) {
+                result.setProperty(property.getKey().substring(JournalkeeperConfigKey.PREFIX.getName().length() + 1), property.getString());
+            }
+        }
         return result;
     }
 
