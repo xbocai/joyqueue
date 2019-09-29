@@ -40,20 +40,21 @@ public class JournalKeeperPartitionGroupStore extends Service implements Partiti
     private final JournalStoreServer server;
     private final String topic;
     private final int group;
-    private final JournalStoreClient client;
-    private final AdminClient adminClient;
+    private JournalStoreClient client;
+    private AdminClient adminClient;
     JournalKeeperPartitionGroupStore(String topic, int group, RaftServer.Roll roll, Properties properties){
         this.topic = topic;
         this.group = group;
         server = new JournalStoreServer(roll, properties);
-        client = server.createClient();
-        adminClient = server.getAdminClient();
+
     }
 
     @Override
     protected void doStart() throws Exception {
         super.doStart();
         server.start();
+        this.client = server.createClient();
+        this.adminClient = server.getAdminClient();
     }
 
     @Override

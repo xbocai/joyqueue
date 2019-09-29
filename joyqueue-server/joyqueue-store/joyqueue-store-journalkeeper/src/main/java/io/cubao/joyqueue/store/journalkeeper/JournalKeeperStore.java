@@ -128,6 +128,7 @@ public class JournalKeeperStore implements StoreService, PropertySupplierAware, 
                                 RaftServer.Roll.VOTER,
                                 properties);
                 store.init(toURIs(brokerIds, topic, partitionGroup), toURI(thisBrokerId, topic, partitionGroup));
+                store.restore();
                 store.start();
                 return store;
             } catch (Exception e) {

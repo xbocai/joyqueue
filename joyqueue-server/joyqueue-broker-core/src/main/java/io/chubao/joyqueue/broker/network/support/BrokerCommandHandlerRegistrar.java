@@ -16,12 +16,17 @@
 package io.chubao.joyqueue.broker.network.support;
 
 import io.chubao.joyqueue.broker.BrokerContext;
+import io.chubao.joyqueue.broker.handler.CreatePartitionGroupHandler;
+import io.chubao.joyqueue.broker.handler.PartitionGroupLeaderChangeHandler;
+import io.chubao.joyqueue.broker.handler.RemovePartitionGroupHandler;
+import io.chubao.joyqueue.broker.handler.UpdatePartitionGroupHandler;
 import io.chubao.joyqueue.broker.index.handler.ConsumeIndexQueryHandler;
 import io.chubao.joyqueue.broker.index.handler.ConsumeIndexStoreHandler;
 import io.chubao.joyqueue.broker.producer.transaction.handler.TransactionCommitRequestHandler;
 import io.chubao.joyqueue.broker.producer.transaction.handler.TransactionRollbackRequestHandler;
 import io.chubao.joyqueue.network.command.CommandType;
 import io.chubao.joyqueue.network.transport.command.support.DefaultCommandHandlerFactory;
+import io.chubao.joyqueue.nsr.network.command.NsrCommandType;
 import io.chubao.joyqueue.server.retry.remote.handler.RemoteRetryMessageHandler;
 
 /**
@@ -45,6 +50,12 @@ public class BrokerCommandHandlerRegistrar {
         // consume position related command
         commandHandlerFactory.register(CommandType.CONSUME_INDEX_QUERY_REQUEST, new ConsumeIndexQueryHandler(brokerContext));
         commandHandlerFactory.register(CommandType.CONSUME_INDEX_STORE_REQUEST, new ConsumeIndexStoreHandler(brokerContext));
+
+        //nameserver
+        commandHandlerFactory.register(NsrCommandType.NSR_CREATE_PARTITIONGROUP, new CreatePartitionGroupHandler(brokerContext));
+        commandHandlerFactory.register(NsrCommandType.NSR_UPDATE_PARTITIONGROUP, new UpdatePartitionGroupHandler(brokerContext));
+        commandHandlerFactory.register(NsrCommandType.NSR_REMOVE_PARTITIONGROUP, new RemovePartitionGroupHandler(brokerContext));
+        commandHandlerFactory.register(NsrCommandType.NSR_LEADERCHANAGE_PARTITIONGROUP, new PartitionGroupLeaderChangeHandler(brokerContext));
 
         // transaction
         commandHandlerFactory.register(CommandType.TRANSACTION_COMMIT_REQUEST, new TransactionCommitRequestHandler(brokerContext));
