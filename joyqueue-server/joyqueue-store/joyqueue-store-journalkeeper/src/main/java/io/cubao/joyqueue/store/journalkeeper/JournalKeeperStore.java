@@ -12,6 +12,8 @@ import io.chubao.joyqueue.toolkit.config.Property;
 import io.chubao.joyqueue.toolkit.config.PropertySupplier;
 import io.chubao.joyqueue.toolkit.config.PropertySupplierAware;
 import io.journalkeeper.core.api.RaftServer;
+import io.journalkeeper.rpc.URIParser;
+import io.journalkeeper.utils.spi.ServiceSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +41,8 @@ public class JournalKeeperStore implements StoreService, PropertySupplierAware, 
     private File base;
     private PropertySupplier propertySupplier;
     private BrokerContext brokerContext;
-
+    private final JoyQueueUriParser joyQueueUriParser =
+            (JoyQueueUriParser )ServiceSupport.load(URIParser.class, JoyQueueUriParser.class.getCanonicalName());
 
     @Override
     public boolean partitionGroupExists(String topic, int partitionGroup) {
@@ -198,14 +201,14 @@ public class JournalKeeperStore implements StoreService, PropertySupplierAware, 
                 .collect(Collectors.toList());
     }
 
-//    private URI toURI(int brokerId, String topic, int group) {
-//        return URI.create("joyqueue://" + topic + "/" + group + "/" + brokerId);
-//    }
     private URI toURI(int brokerId, String topic, int group) {
-        Broker broker = brokerContext.getClusterManager().getBrokerById(brokerId);
-
-        return URI.create("jk://" + broker.getIp() + ":" + broker.getPort());
+        return joyQueueUriParser.create(topic, group, brokerId);
     }
+//    private URI toURI(int brokerId, String topic, int group) {
+//        Broker broker = brokerContext.getClusterManager().getBrokerById(brokerId);
+//
+//        return URI.create("jk://" + broker.getIp() + ":" + broker.getPort());
+//    }
     private void checkOrCreateBase() throws IOException{
         if (!base.exists()) {
             if (!base.mkdirs()) {
@@ -233,6 +236,7 @@ public class JournalKeeperStore implements StoreService, PropertySupplierAware, 
     @Override
     public void setBrokerContext(BrokerContext brokerContext) {
         this.brokerContext = brokerContext;
+        joyQueueUriParser.setBrokerContext(brokerContext);
     }
 
     private static class TopicPartitionGroup {
