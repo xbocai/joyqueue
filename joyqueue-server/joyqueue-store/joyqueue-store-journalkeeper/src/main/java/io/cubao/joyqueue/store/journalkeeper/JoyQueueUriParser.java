@@ -21,7 +21,7 @@ public class JoyQueueUriParser implements URIParser, BrokerContextAware {
     private static final Logger logger = LoggerFactory.getLogger(JoyQueueUriParser.class);
     private BrokerContext brokerContext;
     private static final String SCHEME = "joyqueue";
-    private int portOffset = 5;
+    private int portOffset = 6;
     @Override
     public String[] supportedSchemes() {
         return new String [] {SCHEME};

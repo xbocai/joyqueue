@@ -89,11 +89,6 @@ public class JournalKeeperStore implements StoreService, PropertySupplierAware, 
                 File groupBase = new File(base, getPartitionGroupRelPath(tg.getTopic(), tg.getPartitionGroup()));
                 Properties properties = new Properties();
                 properties.setProperty("working_dir", groupBase.getAbsolutePath());
-                properties.setProperty("snapshot_step", "0");
-                properties.setProperty("rpc_timeout_ms", "600000");
-                properties.setProperty("cache_requests", String.valueOf(1024L * 1024));
-                properties.setProperty("print_metric_interval_sec", String.valueOf(1));
-                properties.setProperty("enable_metric", String.valueOf(true));
                 //TODO: StoreConfig -> properties
                 JournalKeeperPartitionGroupStore store =
                         new JournalKeeperPartitionGroupStore(
@@ -118,11 +113,6 @@ public class JournalKeeperStore implements StoreService, PropertySupplierAware, 
                 File groupBase = new File(base, getPartitionGroupRelPath(tg.getTopic(), tg.getPartitionGroup()));
                 Properties properties = new Properties();
                 properties.setProperty("working_dir", groupBase.getAbsolutePath());
-                properties.setProperty("snapshot_step", "0");
-                properties.setProperty("rpc_timeout_ms", "600000");
-                properties.setProperty("cache_requests", String.valueOf(1024L * 1024));
-                properties.setProperty("print_metric_interval_sec", String.valueOf(1));
-                properties.setProperty("enable_metric", String.valueOf(true));
                 //TODO: StoreConfig -> properties
                 JournalKeeperPartitionGroupStore store =
                         new JournalKeeperPartitionGroupStore(
