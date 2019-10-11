@@ -16,8 +16,6 @@
 package io.chubao.joyqueue.broker.handler;
 
 import io.chubao.joyqueue.broker.BrokerContext;
-import io.chubao.joyqueue.domain.PartitionGroup;
-import io.chubao.joyqueue.exception.JoyQueueCode;
 import io.chubao.joyqueue.network.command.BooleanAck;
 import io.chubao.joyqueue.network.transport.Transport;
 import io.chubao.joyqueue.network.transport.command.Command;
@@ -25,7 +23,6 @@ import io.chubao.joyqueue.network.transport.command.Type;
 import io.chubao.joyqueue.network.transport.command.handler.CommandHandler;
 import io.chubao.joyqueue.nsr.config.NameServiceConfig;
 import io.chubao.joyqueue.nsr.network.command.NsrCommandType;
-import io.chubao.joyqueue.nsr.network.command.UpdatePartitionGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

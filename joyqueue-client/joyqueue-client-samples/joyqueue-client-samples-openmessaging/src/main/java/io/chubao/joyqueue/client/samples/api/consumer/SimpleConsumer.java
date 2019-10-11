@@ -32,11 +32,12 @@ import io.openmessaging.message.Message;
 public class SimpleConsumer {
 
     public static void main(String[] args) throws Exception {
-        final String app = "test_app";
-        final String token = "some token";
+
+        final String app = "journalkeeper";
+        final String token = "07e74fa800bb4215a01dd47c190c573a";
         final String dataCenter = "default";
         final String brokerAddr = "127.0.0.1:50088";
-        final String topic = "test_topic_0";
+        final String topic = "test01";
         // oms:joyqueue://test_app@127.0.0.1:50088/default
         final String url = "oms:joyqueue://" + app +  "@" + brokerAddr + "/" + dataCenter;
 

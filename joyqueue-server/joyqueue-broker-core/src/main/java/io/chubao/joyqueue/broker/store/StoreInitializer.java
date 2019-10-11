@@ -86,7 +86,12 @@ public class StoreInitializer extends Service implements EventListener<MetaEvent
             logger.warn("Restore partition group failed! Topic: {}, group: {}.",
                 replica.getTopic().getFullName(), group, t);
             if(config.getForceRestore()) {
-                storeService.createPartitionGroup(group.getTopic().getFullName(), group.getGroup(), Shorts.toArray(group.getPartitions()), new ArrayList<>(group.getBrokers().keySet()), broker.getId());
+                storeService.createPartitionGroup(
+                        group.getTopic().getFullName(),
+                        group.getGroup(),
+                        Shorts.toArray(group.getPartitions()),
+                        new ArrayList<>(group.getBrokers().keySet()),
+                        broker.getId());
             }
         }
     }

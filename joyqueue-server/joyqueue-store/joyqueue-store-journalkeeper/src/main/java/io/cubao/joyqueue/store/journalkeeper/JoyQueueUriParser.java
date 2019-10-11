@@ -49,4 +49,8 @@ public class JoyQueueUriParser implements URIParser, BrokerContextAware {
             return null;
         }
     }
+
+    public int getBrokerId(URI uri) {
+        return Integer.parseInt(uri.getHost());
+    }
 }

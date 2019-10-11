@@ -19,7 +19,6 @@ import io.chubao.joyqueue.broker.manage.service.BrokerManageService;
 import io.chubao.joyqueue.broker.manage.service.ConnectionManageService;
 import io.chubao.joyqueue.broker.manage.service.ConsumerManageService;
 import io.chubao.joyqueue.broker.manage.service.CoordinatorManageService;
-import io.chubao.joyqueue.broker.manage.service.ElectionManageService;
 import io.chubao.joyqueue.broker.manage.service.MessageManageService;
 import io.chubao.joyqueue.broker.manage.service.StoreManageService;
 import io.chubao.joyqueue.exception.JoyQueueException;

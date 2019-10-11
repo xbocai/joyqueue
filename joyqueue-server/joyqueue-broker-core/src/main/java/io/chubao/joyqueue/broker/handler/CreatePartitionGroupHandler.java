@@ -90,7 +90,12 @@ public class CreatePartitionGroupHandler implements CommandHandler, Type {
     private void commit(PartitionGroup group) throws Exception {
         if(logger.isDebugEnabled())logger.debug("topic[{}] add partitionGroup[{}]",group.getTopic(),group.getGroup());
         //if (!storeService.partitionGroupExists(group.getTopic(),group.getGroup())) {
-            storeService.createPartitionGroup(group.getTopic().getFullName(), group.getGroup(), Shorts.toArray(group.getPartitions()),new ArrayList<>(group.getReplicas()),clusterManager.getBrokerId());
+            storeService.createPartitionGroup(
+                    group.getTopic().getFullName(),
+                    group.getGroup(),
+                    Shorts.toArray(group.getPartitions()),
+                    new ArrayList<>(group.getReplicas()),
+                    clusterManager.getBrokerId());
             //}
 //            Set<Integer> replicas = group.getReplicas();
 //            List<Broker> list = new ArrayList<>(replicas.size());

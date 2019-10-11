@@ -2,7 +2,6 @@ package io.cubao.joyqueue.store.journalkeeper;
 
 import io.chubao.joyqueue.broker.BrokerContext;
 import io.chubao.joyqueue.broker.BrokerContextAware;
-import io.chubao.joyqueue.domain.Broker;
 import io.chubao.joyqueue.monitor.BufferPoolMonitorInfo;
 import io.chubao.joyqueue.store.PartitionGroupStore;
 import io.chubao.joyqueue.store.StoreManagementService;
@@ -95,7 +94,7 @@ public class JournalKeeperStore implements StoreService, PropertySupplierAware, 
                                 topic,
                                 partitionGroup,
                                 RaftServer.Roll.VOTER,
-                                properties);
+                                brokerContext, properties);
                 store.restore();
                 store.start();
                 return store;
@@ -119,7 +118,7 @@ public class JournalKeeperStore implements StoreService, PropertySupplierAware, 
                                 topic,
                                 partitionGroup,
                                 RaftServer.Roll.VOTER,
-                                properties);
+                                brokerContext, properties);
                 store.init(toURIs(brokerIds, topic, partitionGroup), toURI(thisBrokerId, topic, partitionGroup));
                 store.restore();
                 store.start();

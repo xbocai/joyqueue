@@ -1,5 +1,6 @@
 package io.cubao.joyqueue.store.journalkeeper;
 
+import io.chubao.joyqueue.broker.BrokerContext;
 import io.chubao.joyqueue.domain.QosLevel;
 import io.chubao.joyqueue.exception.JoyQueueCode;
 import io.chubao.joyqueue.store.PartitionGroupStore;
@@ -40,11 +41,15 @@ public class JournalKeeperPartitionGroupStore extends Service implements Partiti
     private final JournalStoreServer server;
     private final String topic;
     private final int group;
+    private final BrokerContext brokerContext;
+    private final LeaderReportEventWatcher leaderReportEventWatcher;
     private JournalStoreClient client;
     private AdminClient adminClient;
-    JournalKeeperPartitionGroupStore(String topic, int group, RaftServer.Roll roll, Properties properties){
+    JournalKeeperPartitionGroupStore(String topic, int group, RaftServer.Roll roll, BrokerContext brokerContext, Properties properties){
         this.topic = topic;
         this.group = group;
+        this.brokerContext = brokerContext;
+        this.leaderReportEventWatcher = new LeaderReportEventWatcher(topic, group, brokerContext.getClusterManager());
         server = new JournalStoreServer(roll, properties);
 
     }
@@ -55,10 +60,12 @@ public class JournalKeeperPartitionGroupStore extends Service implements Partiti
         server.start();
         this.client = server.createClient();
         this.adminClient = server.getAdminClient();
+        this.client.watch(leaderReportEventWatcher);
     }
 
     @Override
     protected void doStop() {
+        this.client.unWatch(leaderReportEventWatcher);
         super.doStop();
         server.stop();
     }
@@ -150,12 +157,13 @@ public class JournalKeeperPartitionGroupStore extends Service implements Partiti
         long [] indices = new long[futures.size()];
         try {
             for (int i = 0; i < futures.size(); i++) {
-                indices[i] = futures.get(i).get();
+                Long index = futures.get(i).get();
+                indices[i] = index == null ? -1L: index;
             }
             writeResult.setCode(JoyQueueCode.SUCCESS);
             writeResult.setIndices(indices);
         } catch (ExecutionException | InterruptedException e) {
-            writeResult.setCode(JoyQueueCode.SE_READ_FAILED);
+            writeResult.setCode(JoyQueueCode.SE_WRITE_FAILED);
         }
 
         eventListener.onEvent(writeResult);
@@ -164,8 +172,10 @@ public class JournalKeeperPartitionGroupStore extends Service implements Partiti
     @Override
     public ReadResult read(short partition, long index, int count, long maxSize) {
         try {
-            return client.get(partition, index, count).thenApply(raftEntries -> {
+            return client.get(partition, index, count)
+                    .thenApply(raftEntries -> {
                 ReadResult readResult = new ReadResult();
+                readResult.setCode(JoyQueueCode.SUCCESS);
                 readResult.setMessages(raftEntries.stream().map(RaftEntry::getEntry).map(ByteBuffer::wrap).toArray(ByteBuffer[]::new));
                 return readResult;
             }).get();
