@@ -29,7 +29,6 @@
             <artifactId>journalkeeper-journal-store</artifactId>
             <version>${journalkeeper.version}</version>
         </dependency>
-
         <dependency>
             <groupId>io.chubao</groupId>
             <artifactId>joyqueue-store-api</artifactId>
@@ -38,6 +37,26 @@
             <groupId>io.chubao</groupId>
             <artifactId>joyqueue-broker-core</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.journalkeeper</groupId>
+            <artifactId>journalkeeper-persistence-local</artifactId>
+            <version>${journalkeeper.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.journalkeeper</groupId>
+            <artifactId>journalkeeper-rpc-netty</artifactId>
+            <version>${journalkeeper.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

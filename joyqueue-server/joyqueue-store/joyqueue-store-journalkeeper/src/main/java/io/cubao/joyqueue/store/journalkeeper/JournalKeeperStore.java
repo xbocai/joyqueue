@@ -94,7 +94,8 @@ public class JournalKeeperStore implements StoreService, PropertySupplierAware, 
                                 topic,
                                 partitionGroup,
                                 RaftServer.Roll.VOTER,
-                                brokerContext, properties);
+                                new LeaderReportEventWatcher(topic, partitionGroup, brokerContext.getClusterManager()),
+                                properties);
                 store.restore();
                 store.start();
                 return store;
@@ -118,7 +119,8 @@ public class JournalKeeperStore implements StoreService, PropertySupplierAware, 
                                 topic,
                                 partitionGroup,
                                 RaftServer.Roll.VOTER,
-                                brokerContext, properties);
+                                new LeaderReportEventWatcher(topic, partitionGroup, brokerContext.getClusterManager()),
+                                properties);
                 store.init(toURIs(brokerIds, topic, partitionGroup), toURI(thisBrokerId, topic, partitionGroup));
                 store.restore();
                 store.start();

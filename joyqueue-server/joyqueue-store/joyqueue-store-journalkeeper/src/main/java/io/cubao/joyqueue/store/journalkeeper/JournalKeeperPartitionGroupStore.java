@@ -7,10 +7,12 @@ import io.chubao.joyqueue.store.PartitionGroupStore;
 import io.chubao.joyqueue.store.ReadResult;
 import io.chubao.joyqueue.store.WriteRequest;
 import io.chubao.joyqueue.store.WriteResult;
+import io.chubao.joyqueue.store.message.MessageParser;
 import io.chubao.joyqueue.toolkit.concurrent.EventListener;
 import io.chubao.joyqueue.toolkit.service.Service;
+import io.cubao.joyqueue.store.journalkeeper.entry.JoyQueueEntryParser;
 import io.journalkeeper.core.api.AdminClient;
-import io.journalkeeper.core.api.RaftEntry;
+import io.journalkeeper.core.api.JournalEntry;
 import io.journalkeeper.core.api.RaftServer;
 import io.journalkeeper.core.api.ResponseConfig;
 import io.journalkeeper.exceptions.NotLeaderException;
@@ -41,16 +43,14 @@ public class JournalKeeperPartitionGroupStore extends Service implements Partiti
     private final JournalStoreServer server;
     private final String topic;
     private final int group;
-    private final BrokerContext brokerContext;
     private final LeaderReportEventWatcher leaderReportEventWatcher;
     private JournalStoreClient client;
     private AdminClient adminClient;
-    JournalKeeperPartitionGroupStore(String topic, int group, RaftServer.Roll roll, BrokerContext brokerContext, Properties properties){
+    JournalKeeperPartitionGroupStore(String topic, int group, RaftServer.Roll roll, LeaderReportEventWatcher leaderReportEventWatcher, Properties properties){
         this.topic = topic;
         this.group = group;
-        this.brokerContext = brokerContext;
-        this.leaderReportEventWatcher = new LeaderReportEventWatcher(topic, group, brokerContext.getClusterManager());
-        server = new JournalStoreServer(roll, properties);
+        this.leaderReportEventWatcher = leaderReportEventWatcher;
+        server = new JournalStoreServer(roll, new JoyQueueEntryParser(), properties);
 
     }
 
@@ -60,12 +60,16 @@ public class JournalKeeperPartitionGroupStore extends Service implements Partiti
         server.start();
         this.client = server.createClient();
         this.adminClient = server.getAdminClient();
-        this.client.watch(leaderReportEventWatcher);
+        if(null != leaderReportEventWatcher) {
+            this.client.watch(leaderReportEventWatcher);
+        }
     }
 
     @Override
     protected void doStop() {
-        this.client.unWatch(leaderReportEventWatcher);
+        if(null != leaderReportEventWatcher) {
+            this.client.unWatch(leaderReportEventWatcher);
+        }
         super.doStop();
         server.stop();
     }
@@ -150,6 +154,7 @@ public class JournalKeeperPartitionGroupStore extends Service implements Partiti
                         writeRequest.getPartition(),
                         writeRequest.getBatchSize(),
                         writeRequest.getBuffer().array(),
+                        true,
                         qosLevelToResponseConfig(qosLevel))
                 ).collect(Collectors.toList());
         WriteResult writeResult = new WriteResult();
@@ -172,12 +177,28 @@ public class JournalKeeperPartitionGroupStore extends Service implements Partiti
     @Override
     public ReadResult read(short partition, long index, int count, long maxSize) {
         try {
+
             return client.get(partition, index, count)
-                    .thenApply(raftEntries -> {
-                ReadResult readResult = new ReadResult();
-                readResult.setCode(JoyQueueCode.SUCCESS);
-                readResult.setMessages(raftEntries.stream().map(RaftEntry::getEntry).map(ByteBuffer::wrap).toArray(ByteBuffer[]::new));
-                return readResult;
+                    .thenApply(journalEntries -> {
+                        ReadResult readResult = new ReadResult();
+                        readResult.setCode(JoyQueueCode.SUCCESS);
+                        ByteBuffer [] messageArray = new ByteBuffer[journalEntries.size()];
+                        Long currentIndex = index;
+                        for (int i = 0; i < journalEntries.size(); i++) {
+                            JournalEntry journalEntry = journalEntries.get(i);
+                            byte [] message = journalEntry.getSerializedBytes();
+                            ByteBuffer buffer = ByteBuffer.wrap(message);
+
+                            // 读出来的消息中不含索引值，这里需要设置索引
+                            currentIndex -= journalEntry.getOffset();
+                            MessageParser.setLong(buffer, MessageParser.INDEX, currentIndex);
+                            currentIndex += journalEntry.getBatchSize();
+
+                            messageArray[i] = buffer;
+                        }
+
+                        readResult.setMessages(messageArray);
+                        return readResult;
             }).get();
         } catch (InterruptedException | ExecutionException e) {
             // TODO 细化异常处理

@@ -127,6 +127,7 @@
             <groupId>io.journalkeeper</groupId>
             <artifactId>journalkeeper-metric-dropwizard</artifactId>
             <version>0.1-SNAPSHOT</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
     <build>
