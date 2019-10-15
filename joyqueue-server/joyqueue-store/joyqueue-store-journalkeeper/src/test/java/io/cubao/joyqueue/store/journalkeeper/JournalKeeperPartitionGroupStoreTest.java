@@ -200,11 +200,14 @@ public class JournalKeeperPartitionGroupStoreTest {
         List<ByteBuffer> messages = MessageUtils.build(count, 1024);
 
 
-        final EventFuture<WriteResult> future = new EventFuture<>();
-        store.asyncWrite(future, qosLevel,  messages.stream().map(b -> new WriteRequest(partition, b)).toArray(WriteRequest[]::new));
+        for (ByteBuffer message : messages) {
+            final EventFuture<WriteResult> future = new EventFuture<>();
+            store.asyncWrite(future, qosLevel,   new WriteRequest(partition, message));
+            WriteResult writeResult = future.get();
+            Assert.assertEquals(JoyQueueCode.SUCCESS, writeResult.getCode());
+        }
 
-        WriteResult writeResult = future.get();
-        Assert.assertEquals(JoyQueueCode.SUCCESS, writeResult.getCode());
+
 
         // 等待建索引都完成
         long t0 = SystemClock.now();
