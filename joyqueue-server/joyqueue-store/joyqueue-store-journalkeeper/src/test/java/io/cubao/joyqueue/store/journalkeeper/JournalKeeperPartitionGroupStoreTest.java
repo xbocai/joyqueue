@@ -195,7 +195,7 @@ public class JournalKeeperPartitionGroupStoreTest {
 
     private void writeReadTest(QosLevel qosLevel) throws InterruptedException {
         int count = 1024;
-        short partition = 0;
+        short partition = 5;
         long timeout = 500000L;
         List<ByteBuffer> messages = MessageUtils.build(count, 1024);
 
@@ -320,7 +320,7 @@ public class JournalKeeperPartitionGroupStoreTest {
                         RaftServer.Roll.VOTER,
                         null,
                         properties);
-        store.init(toURIs(Collections.singletonList(brokerId), topic, partitionGroup), toURI(brokerId, topic, partitionGroup));
+        store.init(toURIs(Collections.singletonList(brokerId), topic, partitionGroup), toURI(brokerId, topic, partitionGroup), partitions);
         store.restore();
         store.start();
     }

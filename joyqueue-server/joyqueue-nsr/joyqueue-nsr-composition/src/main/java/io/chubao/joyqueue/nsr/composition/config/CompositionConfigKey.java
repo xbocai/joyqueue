@@ -10,7 +10,7 @@ import io.chubao.joyqueue.toolkit.config.PropertyDef;
 public enum CompositionConfigKey implements PropertyDef {
 
     // 读数据源
-    READ_SOURCE("nameserver.composition.read.source", "ignite", PropertyDef.Type.STRING),
+    READ_SOURCE("nameserver.composition.read.source", "journalkeeper", PropertyDef.Type.STRING),
 
     // 写数据源
     WRITE_SOURCE("nameserver.composition.write.source", "all", PropertyDef.Type.STRING),

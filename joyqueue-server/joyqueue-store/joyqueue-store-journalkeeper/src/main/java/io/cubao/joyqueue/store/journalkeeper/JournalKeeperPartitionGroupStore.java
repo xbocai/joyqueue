@@ -1,6 +1,5 @@
 package io.cubao.joyqueue.store.journalkeeper;
 
-import io.chubao.joyqueue.broker.BrokerContext;
 import io.chubao.joyqueue.domain.QosLevel;
 import io.chubao.joyqueue.exception.JoyQueueCode;
 import io.chubao.joyqueue.store.PartitionGroupStore;
@@ -26,9 +25,11 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -58,8 +59,8 @@ public class JournalKeeperPartitionGroupStore extends Service implements Partiti
     protected void doStart() throws Exception {
         super.doStart();
         server.start();
-        this.client = server.createClient();
-        this.adminClient = server.getAdminClient();
+        this.client = server.createLocalClient();
+        this.adminClient = server.getLocalAdminClient();
         if(null != leaderReportEventWatcher) {
             this.client.watch(leaderReportEventWatcher);
         }
@@ -201,6 +202,8 @@ public class JournalKeeperPartitionGroupStore extends Service implements Partiti
                         return readResult;
             }).get();
         } catch (InterruptedException | ExecutionException e) {
+            logger.warn("Read exception, topic: {}, group: {}, partition: {}, index: {}, count: {}, maxSize: {}.",
+                    topic, group, partition, index, count, maxSize, e);
             // TODO 细化异常处理
             ReadResult readResult = new ReadResult();
             readResult.setCode(JoyQueueCode.SE_READ_FAILED);
@@ -242,8 +245,16 @@ public class JournalKeeperPartitionGroupStore extends Service implements Partiti
         server.recover();
     }
 
-    void init(List<URI> uriList, URI thisServer) throws IOException {
-        server.init(thisServer, uriList);
+    void init(List<URI> uriList, URI thisServer, short [] partitions) throws IOException {
+        Set<Integer> partitionSet = new HashSet<>(partitions.length);
+        for (short partition : partitions) {
+            partitionSet.add((int) partition);
+        }
+        server.init(
+                thisServer,
+                uriList,
+                partitionSet
+        );
     }
 
     void rePartition(Collection<Short> partitions) {
