@@ -685,7 +685,7 @@ public class PositionManager extends Service {
                 if (event.getEventType() == EventType.UPDATE_PARTITION_GROUP) {
                     UpdatePartitionGroupEvent updatePartitionGroupEvent = (UpdatePartitionGroupEvent) event;
 
-                    logger.info("===========listen update partition group event:[{}]", updatePartitionGroupEvent.toString());
+                    logger.info("listen update partition group event:[{}]", updatePartitionGroupEvent.toString());
 
                     TopicName topic = updatePartitionGroupEvent.getTopic();
                     PartitionGroup newPartitionGroup = updatePartitionGroupEvent.getNewPartitionGroup();
@@ -702,8 +702,6 @@ public class PositionManager extends Service {
                     }
 
                     addPartitionGroup(topic, newPartitionGroup);
-                    logger.info("==============end update partition group event:[{}]", updatePartitionGroupEvent.toString());
-
                 }
             } catch (Exception ex) {
                 logger.error("UpdatePartitionGroupListener error.", ex);

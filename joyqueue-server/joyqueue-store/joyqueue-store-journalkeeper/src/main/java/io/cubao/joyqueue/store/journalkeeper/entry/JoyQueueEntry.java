@@ -8,7 +8,6 @@ import io.journalkeeper.core.journal.ParseJournalException;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.zip.CRC32;
 
 /**
  * @author LiYue
@@ -29,6 +28,15 @@ class JoyQueueEntry implements JournalEntry {
 
         if(checkLength) {
             checkLength(serializedBytes);
+        }
+
+        checkBatchSize();
+    }
+
+    private void checkBatchSize() {
+        int batchSize;
+        if((batchSize = getBatchSize()) < 1) {
+            throw new ParseJournalException("Batch size " + batchSize + " should be not less than 1!");
         }
     }
 
@@ -58,7 +66,7 @@ class JoyQueueEntry implements JournalEntry {
 
     @Override
     public void setBatchSize(int batchSize) {
-        BatchMessageParser.setBatch(serializedBuffer, batchSize == 1);
+        BatchMessageParser.setBatch(serializedBuffer, batchSize > 1);
         if(batchSize > 1) {
             BatchMessageParser.setBatchSize(serializedBuffer, (short) batchSize);
         }

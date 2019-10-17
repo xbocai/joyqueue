@@ -67,7 +67,7 @@ public class JournalkeeperInternalServiceProvider extends Service implements Int
         result.setProperty(JDBCConfigs.DATASOURCE_TYPE, "druid");
         result.setProperty(DruidConfigs.URL, "jdbc:h2:file:{datasource.path}/joyqueue;DB_CLOSE_DELAY=TRUE;AUTO_SERVER=TRUE");
         result.setProperty(DruidConfigs.DRIVER_CLASS, "org.h2.Driver");
-
+        result.setProperty("sql.datasource.druid.maxActive", "20");
         for (Property property : properties) {
             if (property.getKey().startsWith(JournalkeeperConfigKey.PREFIX.getName())) {
                 result.setProperty(property.getKey().substring(JournalkeeperConfigKey.PREFIX.getName().length() + 1), property.getString());

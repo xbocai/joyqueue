@@ -1,5 +1,6 @@
 package io.cubao.joyqueue.store.journalkeeper.entry;
 
+import io.chubao.joyqueue.store.message.BatchMessageParser;
 import io.chubao.joyqueue.store.message.MessageParser;
 import io.journalkeeper.core.api.JournalEntry;
 import io.journalkeeper.core.api.JournalEntryParser;
@@ -39,6 +40,7 @@ public class JoyQueueEntryParser implements JournalEntryParser {
         MessageParser.setInt(buffer, MessageParser.LENGTH, rawEntry.length);
         MessageParser.setLong(buffer, MessageParser.CRC, CRC.crc(body));
         MessageParser.setShort(buffer, JournalEntryParseSupport.MAGIC, DefaultJournalEntry.MAGIC_CODE);
+        BatchMessageParser.setBatch(buffer, false);
         return parse(rawEntry);
     }
 

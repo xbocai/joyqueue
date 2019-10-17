@@ -34,7 +34,7 @@ public class SimpleProducer {
     public static void main(String[] args) {
 
         final String app = "journalkeeper";
-        final String token = "88d18fd559ce43f7810fd83874cf07ef";
+        final String token = "487ea19bc6c643c387e5df3e17554d06";
         final String dataCenter = "default";
         final String brokerAddr = "127.0.0.1:50088";
         final String topic = "test01";
