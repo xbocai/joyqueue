@@ -22,6 +22,7 @@ import io.openmessaging.consumer.MessageReceipt;
 import io.openmessaging.extension.Extension;
 import io.openmessaging.extension.QueueMetaData;
 import io.openmessaging.interceptor.ConsumerInterceptor;
+import io.openmessaging.joyqueue.consumer.ConsumerIndex;
 import io.openmessaging.joyqueue.consumer.ExtensionConsumer;
 import io.openmessaging.message.Message;
 
@@ -164,5 +165,40 @@ public class ConsumerWrapper implements ExtensionConsumer {
     @Override
     public QueueMetaData getQueueMetaData(String queueName) {
         return delegate.getQueueMetaData(queueName);
+    }
+
+    @Override
+    public ConsumerIndex getIndex(short partition) {
+        return delegate.getIndex(partition);
+    }
+
+    @Override
+    public void batchAck(List<MessageReceipt> receiptList) {
+        delegate.batchAck(receiptList);
+    }
+
+    @Override
+    public void commitIndex(short partition, long index) {
+        delegate.commitIndex(partition, index);
+    }
+
+    @Override
+    public void commitMaxIndex(short partition) {
+        delegate.commitMaxIndex(partition);
+    }
+
+    @Override
+    public void commitMaxIndex() {
+        delegate.commitMaxIndex();
+    }
+
+    @Override
+    public void commitMinIndex(short partition) {
+        delegate.commitMinIndex(partition);
+    }
+
+    @Override
+    public void commitMinIndex() {
+        delegate.commitMinIndex();
     }
 }
